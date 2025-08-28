@@ -3,7 +3,8 @@ import 'dart:io';
 
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:pikafish_engine/pikafish_engine.dart';
+import './pikafish.dart';
+import './pikafish_state.dart';
 
 import '../cchess/position.dart';
 import '../common/prt.dart';
@@ -54,6 +55,9 @@ class PikafishEngine {
     //
     while (_engine.state.value == PikafishState.starting) {
       await Future.delayed(const Duration(seconds: 1));
+    }
+    if (_engine.state.value == PikafishState.error) {
+      throw Exception('Pikafish engine failed to start.');
     }
 
     _engine.stdin = 'uci';
@@ -170,7 +174,10 @@ class PikafishEngine {
   }
 
   _setupEngine() {
+    print("Starting: Pikafish()");
     _engine = Pikafish();
+    print("Done: Pikafish()");
+    print(_engine.state.value);
     _subscriber();
   }
 
@@ -196,8 +203,11 @@ class PikafishEngine {
   _setupNnue() async {
     //
     final appDocDir = await getApplicationDocumentsDirectory();
+    print(appDocDir);
+    final tempDir = await getTemporaryDirectory();
+    print(tempDir);
     final nnueFile = File('${appDocDir.path}/pikafish0305.nnue');
-
+    print(nnueFile);
     if (!(await nnueFile.exists())) {
       await nnueFile.create(recursive: true);
       final bytes = await rootBundle.load('assets/pikafish.nnue');

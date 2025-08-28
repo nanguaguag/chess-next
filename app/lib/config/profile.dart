@@ -34,10 +34,12 @@ class Profile {
     if (!_loadOk) {
       //
       final docDir = await getApplicationDocumentsDirectory();
-      _file = File('${docDir.path}/$fileName');
-
+      final file = File('${docDir.path}/$fileName');
+      if (!await file.exists()) {
+        await file.writeAsString('{}'); // 写一个空的 JSON，避免崩溃
+      }
       try {
-        final contents = await _file!.readAsString();
+        final contents = await file.readAsString();
         _values = jsonDecode(contents);
         _loadOk = true;
       } catch (e) {

@@ -7,7 +7,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../config/local_data.dart';
-import '../../game/game.dart';
 import '../../services/audios.dart';
 import '../../ui/snack_bar.dart';
 import 'pikafish_params_page.dart';
@@ -59,21 +58,18 @@ class SettingsPageState extends State<SettingsPage> {
     } else {
       Audios.stopBgm();
     }
-
     LocalData().save();
   }
 
   switchTone(bool value) async {
     //
     setState(() => LocalData().toneEnabled.value = value);
-
     LocalData().save();
   }
 
   switchHighContrast(bool value) async {
     //
     setState(() => LocalData().highContrast.value = value);
-
     LocalData().save();
   }
 
@@ -82,11 +78,9 @@ class SettingsPageState extends State<SettingsPage> {
     callback(String? fontFamily) async {
       //
       Navigator.of(context).pop();
-
       setState(() {
         LocalData().artFont.value = fontFamily!;
       });
-
       LocalData().save();
     }
 
@@ -98,7 +92,6 @@ class SettingsPageState extends State<SettingsPage> {
           children: <Widget>[
             const SizedBox(height: 10),
             RadioListTile(
-              activeColor: GameColors.primary,
               title: const Text('小隶'),
               groupValue: LocalData().artFont.value as String,
               value: 'XiaoLi',
@@ -106,7 +99,6 @@ class SettingsPageState extends State<SettingsPage> {
             ),
             const Divider(),
             RadioListTile(
-              activeColor: GameColors.primary,
               title: const Text('中山体'),
               groupValue: LocalData().artFont.value as String,
               value: 'ZhongSan',
@@ -114,7 +106,6 @@ class SettingsPageState extends State<SettingsPage> {
             ),
             const Divider(),
             RadioListTile(
-              activeColor: GameColors.primary,
               title: const Text('启体'),
               groupValue: LocalData().artFont.value as String,
               value: 'QiTi',
@@ -131,14 +122,11 @@ class SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     //
-    final TextStyle headerStyle = GameFonts.ui(
-      color: GameColors.secondary,
+    final TextStyle headerStyle = TextStyle(
       fontSize: 20,
+      fontWeight: FontWeight.bold,
     );
-    final TextStyle itemStyle = GameFonts.uicp();
-
     return Scaffold(
-      backgroundColor: GameColors.lightBackground,
       appBar: AppBar(title: const Text('设置')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -149,37 +137,31 @@ class SettingsPageState extends State<SettingsPage> {
             Text('引擎设置', style: headerStyle),
             const SizedBox(height: 10.0),
             Card(
-              color: GameColors.boardBackground,
               elevation: 0.5,
               margin: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 0),
               child: Column(
                 children: <Widget>[
                   SwitchListTile(
-                    activeColor: GameColors.primary,
                     value: LocalData().cloudEngineEnabled.value,
-                    title: Text('启用云库', style: itemStyle),
+                    title: Text('启用云库'),
                     onChanged: switchCloudEngine,
                   ),
                   _buildDivider(),
                   ListTile(
-                    title: Text('皮卡鱼参数', style: itemStyle),
+                    title: Text('皮卡鱼参数'),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: const <Widget>[
                         Text('配置'),
-                        Icon(
-                          Icons.keyboard_arrow_right,
-                          color: GameColors.secondary,
-                        ),
+                        Icon(Icons.keyboard_arrow_right),
                       ],
                     ),
                     onTap: changeEngineConfig,
                   ),
                   _buildDivider(),
                   SwitchListTile(
-                    activeColor: GameColors.primary,
                     value: LocalData().thinkingArrowEnabled.value,
-                    title: Text('引擎思考箭头', style: itemStyle),
+                    title: Text('引擎思考箭头'),
                     onChanged: switchThinkingArrow,
                   ),
                 ],
@@ -188,21 +170,18 @@ class SettingsPageState extends State<SettingsPage> {
             const SizedBox(height: 16),
             Text('声音', style: headerStyle),
             Card(
-              color: GameColors.boardBackground,
               margin: const EdgeInsets.symmetric(vertical: 10),
               child: Column(
                 children: <Widget>[
                   SwitchListTile(
-                    activeColor: GameColors.primary,
                     value: LocalData().bgmEnabled.value,
-                    title: Text('背景音乐', style: itemStyle),
+                    title: Text('背景音乐'),
                     onChanged: switchMusic,
                   ),
                   _buildDivider(),
                   SwitchListTile(
-                    activeColor: GameColors.primary,
                     value: LocalData().toneEnabled.value,
-                    title: Text('提示音效', style: itemStyle),
+                    title: Text('提示音效'),
                     onChanged: switchTone,
                   ),
                 ],
@@ -212,13 +191,12 @@ class SettingsPageState extends State<SettingsPage> {
             Text('棋盘', style: headerStyle),
             const SizedBox(height: 10.0),
             Card(
-              color: GameColors.boardBackground,
               elevation: 0.5,
               margin: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 0),
               child: Column(
                 children: <Widget>[
                   ListTile(
-                    title: Text('字体', style: itemStyle),
+                    title: Text('字体'),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
@@ -229,17 +207,15 @@ class SettingsPageState extends State<SettingsPage> {
                                   ? '中山体'
                                   : '小隶',
                         ),
-                        const Icon(Icons.keyboard_arrow_right,
-                            color: GameColors.secondary),
+                        const Icon(Icons.keyboard_arrow_right),
                       ],
                     ),
                     onTap: changeFont,
                   ),
                   _buildDivider(),
                   SwitchListTile(
-                    activeColor: GameColors.primary,
                     value: LocalData().highContrast.value,
-                    title: Text('使用强对比色', style: itemStyle),
+                    title: Text('使用强对比色'),
                     onChanged: switchHighContrast,
                   )
                 ],
@@ -248,37 +224,56 @@ class SettingsPageState extends State<SettingsPage> {
             const SizedBox(height: 16),
             TextButton(
               onPressed: clickAboutTitle,
+              style: ButtonStyle(
+                padding: WidgetStateProperty.all(EdgeInsets.zero),
+                minimumSize: WidgetStateProperty.all(Size.zero),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                overlayColor: WidgetStateProperty.all(Colors.transparent),
+
+                // 关键点：用主题里的颜色，而不是写死
+                foregroundColor: WidgetStateProperty.resolveWith<Color?>(
+                  (states) {
+                    if (states.contains(WidgetState.pressed)) {
+                      return Theme.of(context).colorScheme.primary; // 点击时高亮
+                    }
+                    return Theme.of(context)
+                        .textTheme
+                        .bodyMedium
+                        ?.color; // 正常文本颜色
+                  },
+                ),
+
+                textStyle: WidgetStateProperty.all(
+                  Theme.of(context).textTheme.bodyMedium, // 跟随系统字体大小/颜色
+                ),
+              ),
               child: Text('关于', style: headerStyle),
             ),
             Card(
-              color: GameColors.boardBackground,
               margin: const EdgeInsets.symmetric(vertical: 10),
               child: Column(
                 children: <Widget>[
                   if (Platform.isIOS)
                     ListTile(
-                      title: Text('五星好评', style: itemStyle),
+                      title: Text('五星好评'),
                       trailing: const Icon(
                         Icons.keyboard_arrow_right,
-                        color: GameColors.secondary,
                       ),
                       onTap: () => ReviewPanel.popRequest(force: true),
                     ),
                   if (Platform.isIOS) _buildDivider(),
                   ListTile(
-                    title: Text('隐私政策', style: itemStyle),
+                    title: Text('隐私政策'),
                     trailing: const Icon(
                       Icons.keyboard_arrow_right,
-                      color: GameColors.secondary,
                     ),
                     onTap: () => openPrivacyPolicy(context),
                   ),
                   _buildDivider(),
                   ListTile(
-                    title: Text('关于', style: itemStyle),
+                    title: Text('关于'),
                     trailing: const Icon(
                       Icons.keyboard_arrow_right,
-                      color: GameColors.secondary,
                     ),
                     onTap: () => showAbout(context),
                   ),
@@ -296,7 +291,6 @@ class SettingsPageState extends State<SettingsPage> {
         margin: const EdgeInsets.symmetric(horizontal: 16),
         width: double.infinity,
         height: 1.0,
-        color: GameColors.lightLine,
       );
 
   @override

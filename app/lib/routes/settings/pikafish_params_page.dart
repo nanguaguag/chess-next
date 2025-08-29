@@ -25,20 +25,18 @@ class PikafishParamsPageState extends State<PikafishParamsPage> {
     required Function plus,
   }) {
     //
-    final TextStyle itemStyle = GameFonts.uicp();
-
     return ListTile(
-      title: Text(title, style: itemStyle),
+      title: Text(title),
       trailing: Row(mainAxisSize: MainAxisSize.min, children: <Widget>[
         IconButton(
-          icon: const Icon(Icons.remove, color: GameColors.secondary),
+          icon: const Icon(Icons.remove),
           onPressed: () => setState(() {
             reduce();
           }),
         ),
         Text('$initValue $unit'),
         IconButton(
-          icon: const Icon(Icons.add, color: GameColors.secondary),
+          icon: const Icon(Icons.add),
           onPressed: () => setState(() {
             plus();
           }),
@@ -59,15 +57,11 @@ class PikafishParamsPageState extends State<PikafishParamsPage> {
 
   @override
   Widget build(BuildContext context) {
-    //
-    final TextStyle headerStyle = GameFonts.ui(
-      color: GameColors.secondary,
+    final TextStyle headerStyle = TextStyle(
       fontSize: 20,
+      fontWeight: FontWeight.bold,
     );
-    final TextStyle itemStyle = GameFonts.uicp();
-
     return Scaffold(
-      backgroundColor: GameColors.lightBackground,
       appBar: AppBar(title: const Text('皮卡鱼')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -78,7 +72,6 @@ class PikafishParamsPageState extends State<PikafishParamsPage> {
             Text('引擎参数', style: headerStyle),
             const SizedBox(height: 10.0),
             Card(
-              color: GameColors.boardBackground,
               elevation: 0.5,
               margin: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 0),
               child: Column(
@@ -120,9 +113,8 @@ class PikafishParamsPageState extends State<PikafishParamsPage> {
                   ),
                   _buildDivider(),
                   SwitchListTile(
-                    activeColor: GameColors.primary,
                     value: config.ponder,
-                    title: Text('后台思考', style: itemStyle),
+                    title: Text('后台思考'),
                     onChanged: switchPonder,
                   ),
                 ],
@@ -139,6 +131,5 @@ class PikafishParamsPageState extends State<PikafishParamsPage> {
         margin: const EdgeInsets.symmetric(horizontal: 16),
         width: double.infinity,
         height: 1.0,
-        color: GameColors.lightLine,
       );
 }

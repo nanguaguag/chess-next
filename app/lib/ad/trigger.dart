@@ -15,10 +15,10 @@ enum AdAction {
 
 class AdActionLimits {
   // Battle scene
-  static const battleTimes = 5;
-  static const battleRegretTimes = 5;
-  static const battleHintTimes = 10;
-  static const battleAnalysisTimes = 5;
+  static const battleTimes = 999999; //5;
+  static const battleRegretTimes = 999999; //5;
+  static const battleHintTimes = 999999; //10;
+  static const battleAnalysisTimes = 999999; //5;
 }
 
 class AdTrigger {

@@ -34,9 +34,6 @@ flutter:
   uses-material-design: true
 
   assets:
-    - images/logo.png
-    - images/mei.png
-    - images/zhu.png
     - images/qrcode.png
     - images/bg.jpg
     - images/room.png

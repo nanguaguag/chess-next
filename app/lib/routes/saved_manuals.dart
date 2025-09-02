@@ -14,6 +14,7 @@ import '../game/game.dart';
 import '../game/page_state.dart';
 import '../ui/build_utils.dart';
 import '../ui/settings/edit_page.dart';
+import '../routes/settings/settings_page.dart';
 
 class ManualRef {
   Key? data;
@@ -146,7 +147,7 @@ class _SavedManualsState extends State<SavedManuals> {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: Text('改名', style: GameFonts.uicp()),
+        title: Text('改名'),
         content: const Text('现在去修改棋谱名称吗？'),
         actions: <Widget>[
           TextButton(
@@ -179,7 +180,7 @@ class _SavedManualsState extends State<SavedManuals> {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: Text('DELETE', style: GameFonts.uicp()),
+        title: Text('DELETE'),
         content: const Text('删除棋谱？'),
         actions: <Widget>[
           TextButton(
@@ -243,7 +244,7 @@ class _SavedManualsState extends State<SavedManuals> {
             padding: const EdgeInsets.symmetric(vertical: 16),
             child: Text(
               '--',
-              style: GameFonts.ui(fontSize: 16, color: Colors.black38),
+              style: TextStyle(fontSize: 16),
             ),
           ),
         );
@@ -252,17 +253,14 @@ class _SavedManualsState extends State<SavedManuals> {
       return _loading ? buildLoadingWidget() : const SizedBox();
     }
 
-    final titleStyle = GameFonts.uicp(fontSize: 16);
-    final subtitleStyle = GameFonts.uicp(fontSize: 13);
+    final titleStyle = TextStyle(fontSize: 16);
+    final subtitleStyle = TextStyle(fontSize: 13);
 
     final tile = ListTile(
-      leading: const Icon(Icons.book, color: GameColors.secondary),
+      leading: const Icon(Icons.book),
       title: Text(_manuals[index].title, style: titleStyle),
-      subtitle: Text('在完整版中查看', style: subtitleStyle),
-      trailing: const Icon(
-        Icons.keyboard_arrow_right,
-        color: GameColors.secondary,
-      ),
+      subtitle: Text('查看', style: subtitleStyle),
+      trailing: const Icon(Icons.keyboard_arrow_right),
       onTap: () => openManual(index),
     );
 
@@ -273,7 +271,7 @@ class _SavedManualsState extends State<SavedManuals> {
           const Expanded(child: SizedBox()),
           Text(
             'DELETE',
-            style: GameFonts.ui(color: Colors.white, fontSize: 17),
+            style: TextStyle(color: Colors.white, fontSize: 17),
           ),
           const SizedBox(width: 16),
         ],
@@ -286,7 +284,7 @@ class _SavedManualsState extends State<SavedManuals> {
           const SizedBox(width: 16),
           Text(
             '改名',
-            style: GameFonts.ui(color: Colors.white, fontSize: 17),
+            style: TextStyle(color: Colors.white, fontSize: 17),
           ),
           const Expanded(child: SizedBox()),
         ],
@@ -329,15 +327,13 @@ class _SavedManualsState extends State<SavedManuals> {
   @override
   Widget build(BuildContext context) {
     //
-    final header = createPageHeader(context, GameScene.gameNotation);
-
     final list = Container(
       width: double.infinity,
       margin: const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 32),
-      padding: const EdgeInsets.only(top: 16),
+      //padding: const EdgeInsets.only(top: 16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(5),
-        color: GameColors.boardBackground,
+        color: Colors.grey.withValues(alpha: 0.2),
       ),
       child: RefreshIndicator(
         onRefresh: refresh,
@@ -349,24 +345,34 @@ class _SavedManualsState extends State<SavedManuals> {
     );
 
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('images/bg.jpg'),
-            fit: BoxFit.cover,
+      appBar: AppBar(
+        title: Text(
+          titleFor(context, GameScene.gameNotation),
+          overflow: TextOverflow.ellipsis,
+        ),
+        centerTitle: true,
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () async {
+              await Navigator.of(context).push(
+                CupertinoPageRoute(
+                  builder: (context) => const SettingsPage(),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+      body: Column(children: <Widget>[
+        Expanded(
+          child: MediaQuery.removePadding(
+            context: context,
+            removeTop: true,
+            child: list,
           ),
         ),
-        child: Column(children: <Widget>[
-          header,
-          Expanded(
-            child: MediaQuery.removePadding(
-              context: context,
-              removeTop: true,
-              child: list,
-            ),
-          ),
-        ]),
-      ),
+      ]),
     );
   }
 

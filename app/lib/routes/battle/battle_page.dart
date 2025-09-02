@@ -115,7 +115,7 @@ class BattlePageState extends State<BattlePage>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('开始新对局？', style: GameFonts.uicp()),
+        title: Text('开始新对局？'),
         content: SingleChildScrollView(
           child: Column(
             children: [
@@ -518,7 +518,7 @@ class BattlePageState extends State<BattlePage>
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: Text('赢了', style: GameFonts.uicp()),
+        title: Text('赢了'),
         content: const Text('恭喜您取得胜利！'),
         actions: <Widget>[
           TextButton(
@@ -548,7 +548,7 @@ class BattlePageState extends State<BattlePage>
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: Text('输了', style: GameFonts.uicp()),
+        title: Text('输了'),
         content: const Text('败亦可喜！'),
         actions: <Widget>[
           TextButton(
@@ -578,7 +578,7 @@ class BattlePageState extends State<BattlePage>
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: Text('和棋', style: GameFonts.uicp()),
+        title: Text('和棋'),
         content: const Text('和为贵！'),
         actions: <Widget>[
           TextButton(
@@ -600,32 +600,6 @@ class BattlePageState extends State<BattlePage>
   @override
   Widget build(BuildContext context) {
     //
-    final header = createPageHeader(
-      context,
-      GameScene.battle,
-      rightAction: () async {
-        //
-        await HybridEngine().stop();
-
-        _boardState.engineInfo = null;
-        _boardState.bestmove = null;
-
-        if (!mounted) return;
-
-        await Navigator.of(context).push(
-          CupertinoPageRoute(
-            builder: (context) => const SettingsPage(),
-          ),
-        );
-
-        if (_boardState.isOpponentTurn && !_opponentHuman) {
-          engineGo();
-        } else {
-          _pageState.changeStatus(BattlePage.yourTurn);
-        }
-      },
-    );
-
     final board = createChessBoard(
       context,
       GameScene.battle,
@@ -647,15 +621,44 @@ class BattlePageState extends State<BattlePage>
     );
 
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('images/bg.jpg'),
-            fit: BoxFit.cover,
-          ),
+      appBar: AppBar(
+        title: Text(
+          titleFor(context, GameScene.battle),
+          overflow: TextOverflow.ellipsis,
         ),
-        child: Column(children: <Widget>[header, board, operatorBar, footer]),
+        centerTitle: true,
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () async {
+              //
+              await HybridEngine().stop();
+
+              _boardState.engineInfo = null;
+              _boardState.bestmove = null;
+
+              if (!mounted) return;
+
+              await Navigator.of(context).push(
+                CupertinoPageRoute(
+                  builder: (context) => const SettingsPage(),
+                ),
+              );
+
+              if (_boardState.isOpponentTurn && !_opponentHuman) {
+                engineGo();
+              } else {
+                _pageState.changeStatus(BattlePage.yourTurn);
+              }
+            },
+          )
+        ],
       ),
+      body: Column(children: <Widget>[
+        board,
+        operatorBar,
+        footer,
+      ]),
     );
   }
 
@@ -681,7 +684,6 @@ class BattlePageState extends State<BattlePage>
     //
     final manualStyle = GameFonts.ui(
       fontSize: 15,
-      color: GameColors.darkTextSecondary,
       height: 1.5,
     );
 

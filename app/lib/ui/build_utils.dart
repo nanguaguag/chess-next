@@ -24,32 +24,22 @@ Widget createPageHeader(BuildContext context, GameScene scene,
   final isLongScreen = Ruler.isLongScreen(context);
 
   final backButton = IconButton(
-    icon: const Icon(
-      Icons.arrow_back,
-      color: GameColors.darkTextPrimary,
-    ),
-    onPressed: leftAction ?? () => Navigator.of(context).pop(),
+    icon: const Icon(Icons.arrow_back),
+    onPressed: () => Navigator.of(context).pop(),
   );
 
   final settingButton = IconButton(
-    icon: const Icon(
-      Icons.settings,
-      color: GameColors.darkTextPrimary,
+    icon: const Icon(Icons.settings),
+    onPressed: () => Navigator.of(context).push(
+      CupertinoPageRoute(
+        builder: (context) => const SettingsPage(),
+      ),
     ),
-    onPressed: rightAction ??
-        () => Navigator.of(context).push(
-              CupertinoPageRoute(
-                builder: (context) => const SettingsPage(),
-              ),
-            ),
   );
 
   final title = Text(
     titleFor(context, scene),
-    style: GameFonts.art(
-      fontSize: 28,
-      color: GameColors.darkTextPrimary,
-    ),
+    style: TextStyle(fontSize: 25),
   );
 
   final subtitle = Consumer<PageState>(
@@ -59,10 +49,7 @@ Widget createPageHeader(BuildContext context, GameScene scene,
         child: Text(
           pageState.status,
           maxLines: 1,
-          style: GameFonts.ui(
-            fontSize: 16,
-            color: GameColors.darkTextSecondary,
-          ),
+          style: TextStyle(fontSize: 16),
         ),
       );
     },
@@ -70,10 +57,10 @@ Widget createPageHeader(BuildContext context, GameScene scene,
 
   final hLine = Container(
     height: 4,
-    width: 180,
+    width: 80,
     margin: const EdgeInsets.only(bottom: 10),
     decoration: BoxDecoration(
-      color: GameColors.boardBackground,
+      color: Colors.grey,
       borderRadius: BorderRadius.circular(2),
     ),
   );

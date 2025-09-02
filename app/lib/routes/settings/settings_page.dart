@@ -127,7 +127,10 @@ class SettingsPageState extends State<SettingsPage> {
       fontWeight: FontWeight.bold,
     );
     return Scaffold(
-      appBar: AppBar(title: const Text('设置')),
+      appBar: AppBar(
+        title: const Text('设置'),
+        centerTitle: true,
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(

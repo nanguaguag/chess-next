@@ -24,7 +24,6 @@ class MainMenuState extends State<MainMenu> {
   @override
   Widget build(BuildContext context) {
     //
-
     final ButtonStyle menuBtnStyle = ButtonStyle(
       padding: WidgetStateProperty.all(EdgeInsets.all(20)),
     );

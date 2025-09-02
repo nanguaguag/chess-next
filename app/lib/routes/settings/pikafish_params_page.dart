@@ -2,7 +2,6 @@ import 'package:chessroad/engine/pikafish_config.dart';
 import 'package:flutter/material.dart';
 
 import '../../config/local_data.dart';
-import '../../game/game.dart';
 
 class PikafishParamsPage extends StatefulWidget {
   //
@@ -62,7 +61,10 @@ class PikafishParamsPageState extends State<PikafishParamsPage> {
       fontWeight: FontWeight.bold,
     );
     return Scaffold(
-      appBar: AppBar(title: const Text('皮卡鱼')),
+      appBar: AppBar(
+        title: const Text('皮卡鱼'),
+        centerTitle: true,
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(

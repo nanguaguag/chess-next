@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../game/game.dart';
 import 'build_utils.dart';
 import 'ruler.dart';
 
@@ -25,7 +24,7 @@ class _OperationBarState extends State<OperationBar> {
   final keys = <GlobalKey>[];
   final GlobalKey containerKey = GlobalKey();
 
-  final buttonStyle = GameFonts.art(fontSize: 20, color: GameColors.primary);
+  final buttonStyle = TextStyle(fontSize: 20);
   final finalChildren = <Widget>[];
 
   bool finalLayout = false;
@@ -34,16 +33,14 @@ class _OperationBarState extends State<OperationBar> {
     //
     if (finalChildren.length == widget.items.length) return;
 
-    final itemStyle = GameFonts.uicp(fontSize: 18);
     final moreItems = widget.items.sublist(finalChildren.length);
-
     final children = <Widget>[];
 
     if (moreItems.length < 5) {
       for (final e in moreItems) {
         children.add(
           ListTile(
-            title: Text(e.name, style: itemStyle),
+            title: Text(e.name),
             onTap: () {
               Navigator.of(context).pop();
               if (e.callback != null) e.callback!();
@@ -65,7 +62,7 @@ class _OperationBarState extends State<OperationBar> {
               Expanded(
                 flex: 1,
                 child: TextButton(
-                  child: Text(left.name, style: itemStyle),
+                  child: Text(left.name),
                   onPressed: () {
                     Navigator.of(context).pop();
                     if (left.callback != null) left.callback!();
@@ -78,7 +75,7 @@ class _OperationBarState extends State<OperationBar> {
                 child: right == null
                     ? const SizedBox()
                     : TextButton(
-                        child: Text(right.name, style: itemStyle),
+                        child: Text(right.name),
                         onPressed: () {
                           Navigator.of(context).pop();
                           if (right.callback != null) right.callback!();
@@ -158,10 +155,7 @@ class _OperationBarState extends State<OperationBar> {
   Widget build(BuildContext context) {
     //
     return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(5),
-        color: GameColors.boardBackground,
-      ),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(5)),
       margin: EdgeInsets.symmetric(horizontal: boardPaddingH(context)),
       padding: const EdgeInsets.symmetric(vertical: 2),
       height: Ruler.kOperationBarHeight,
@@ -174,7 +168,7 @@ class _OperationBarState extends State<OperationBar> {
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.more_horiz, color: GameColors.primary),
+            icon: const Icon(Icons.more_horiz),
             onPressed: showMore,
           ),
         ],

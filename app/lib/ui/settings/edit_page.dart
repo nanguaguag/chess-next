@@ -40,7 +40,6 @@ class EditPageState extends State<EditPage> {
     //
     final inputBorder = OutlineInputBorder(
       borderRadius: BorderRadius.circular(25),
-      borderSide: const BorderSide(color: GameColors.secondary),
     );
 
     return Scaffold(
@@ -56,7 +55,6 @@ class EditPageState extends State<EditPage> {
           )
         ],
       ),
-      backgroundColor: GameColors.lightBackground,
       body: Container(
         margin: const EdgeInsets.all(16),
         child: Column(
@@ -71,7 +69,7 @@ class EditPageState extends State<EditPage> {
                 enabledBorder: inputBorder,
                 focusedBorder: inputBorder,
               ),
-              style: GameFonts.uicp(fontSize: 16),
+              style: TextStyle(fontSize: 16),
               onSubmitted: (input) => onSubmit(input),
               focusNode: _commentFocus,
             ),

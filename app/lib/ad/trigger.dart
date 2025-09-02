@@ -74,8 +74,8 @@ class AdTrigger {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: Text('请支持作者！', style: GameFonts.uicp()),
-        content: Text(message, style: GameFonts.uicp(fontSize: 16)),
+        title: Text('请支持作者！'),
+        content: Text(message, style: TextStyle(fontSize: 16)),
         actions: <Widget>[
           TextButton(
             child: const Text('不了'),
@@ -97,7 +97,9 @@ class AdTrigger {
     //
     // 每天三次激励视频
     if (LocalData().showAdDate.value == today &&
-        LocalData().showAdTimes.value >= 3) return false;
+        LocalData().showAdTimes.value >= 3) {
+      return false;
+    }
 
     if (isAdTime(action)) {
       requestShowRewardAd(action, context);

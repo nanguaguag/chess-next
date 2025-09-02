@@ -69,23 +69,13 @@ class ChessRoadAppState extends State<ChessRoadApp>
     SettingsPage(),
   ];
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
   Future<void> initAsync() async {
     //
     await LocalData().load();
 
     if (!mounted) return;
 
-    bool newUser = await checkPrivacyPolicy();
-
     await Ad.instance.init();
-
-    startSplashAd(newUser);
 
     Audios.init();
 
@@ -113,14 +103,18 @@ class ChessRoadAppState extends State<ChessRoadApp>
     }
   }
 
-  checkPrivacyPolicy() async {
-    //
-    if (!LocalData().acceptedPrivacyPolicy.value) {
-      await openPrivacyPolicy(context);
-      return true;
-    }
+  // 在依赖变化或首次插入 widget 树时调用
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
 
-    return false;
+    if (_waitingInit == false) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        if (!LocalData().acceptedPrivacyPolicy.value) {
+          await openPrivacyPolicy(context);
+        }
+      });
+    }
   }
 
   String charRepeat(String ch, int times) {
@@ -134,15 +128,43 @@ class ChessRoadAppState extends State<ChessRoadApp>
     return result;
   }
 
-  @override
-  Widget build(BuildContext context) {
-    //
+  Widget getMainApp() {
     if (_waitingInit) {
-      return Center(
-        child: CircularProgressIndicator(),
+      return Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    } else {
+      return Scaffold(
+        body: _screens[_selectedIndex],
+        bottomNavigationBar: NavigationBar(
+          selectedIndex: _selectedIndex,
+          labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
+          onDestinationSelected: (int index) {
+            setState(() {
+              _selectedIndex = index;
+            });
+          },
+          destinations: const [
+            NavigationDestination(
+              icon: Icon(Icons.home_outlined),
+              selectedIcon: Icon(Icons.home),
+              label: "首页",
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.settings_outlined),
+              selectedIcon: Icon(Icons.settings),
+              label: "设置",
+            ),
+          ],
+        ),
       );
     }
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<BoardState>(create: (_) => BoardState()),
@@ -165,23 +187,7 @@ class ChessRoadAppState extends State<ChessRoadApp>
         themeMode: ThemeMode.system, // 暗黑模式跟随系统
         builder: EasyLoading.init(),
         debugShowCheckedModeBanner: false,
-        home: Scaffold(
-          body: _screens[_selectedIndex],
-          bottomNavigationBar: BottomNavigationBar(
-            currentIndex: _selectedIndex,
-            onTap: _onItemTapped,
-            items: const <BottomNavigationBarItem>[
-              BottomNavigationBarItem(
-                icon: Icon(Icons.home),
-                label: "首页",
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.settings),
-                label: "设置",
-              ),
-            ],
-          ),
-        ),
+        home: getMainApp(),
       ),
     );
   }

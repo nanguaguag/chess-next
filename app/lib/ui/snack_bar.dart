@@ -12,7 +12,6 @@ void showSnackBar(
   //
   ScaffoldMessenger.of(ChessRoadApp.context).showSnackBar(
     SnackBar(
-      backgroundColor: bgColor ?? GameColors.primary,
       duration: Duration(milliseconds: shortDuration ? 1000 : 4000),
       content: Text(text),
       action: action,

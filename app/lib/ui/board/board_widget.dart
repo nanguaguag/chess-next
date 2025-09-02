@@ -33,7 +33,7 @@ class BoardWidget extends StatelessWidget {
       height: height,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(5),
-        color: GameColors.boardBackground,
+        color: GameColors.boardBackground, // 棋盘背景色
       ),
       child: Consumer<BoardState>(
         builder: (context, board, child) {

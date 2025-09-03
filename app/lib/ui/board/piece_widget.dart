@@ -11,14 +11,14 @@ class PieceWidget extends StatelessWidget {
   final double diameter, squreSide;
   final bool rotate;
 
-  const PieceWidget(
-      {Key? key,
-      required this.piece,
-      required this.selected,
-      required this.diameter,
-      required this.squreSide,
-      this.rotate = false})
-      : super(key: key);
+  const PieceWidget({
+    super.key,
+    required this.piece,
+    required this.selected,
+    required this.diameter,
+    required this.squreSide,
+    this.rotate = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -65,8 +65,9 @@ class PieceWidget extends StatelessWidget {
           child: Center(
             child: Text(
               Piece.zhName[piece]!,
-              style: textStyle,
-              textScaleFactor: 1,
+              style: textStyle.copyWith(
+                height: 1.0, // 行高与字体大小一致
+              ),
             ),
           ),
         ),
@@ -94,8 +95,9 @@ class PieceWidget extends StatelessWidget {
         child: Center(
           child: Text(
             Piece.zhName[piece]!,
-            style: textStyle,
-            textScaleFactor: 1,
+            style: textStyle.copyWith(
+              height: 1.0, // 行高与字体大小一致
+            ),
           ),
         ),
       ),

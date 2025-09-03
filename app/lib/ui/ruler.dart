@@ -7,8 +7,6 @@ class Ruler {
     return top > 0 ? top : -1;
   }
 
-  static const kOperationBarHeight = 54.0;
-
   static const kBoardMargin = 10.0;
   static const kBoardPadding = 5.0;
   static const kBoardDigitsHeight = 20.0;

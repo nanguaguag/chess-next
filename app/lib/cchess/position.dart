@@ -202,6 +202,7 @@ class Position {
         same(last9Moves(3), last9Moves(7));
   }
 
+  /// 保存对局
   Future<bool> saveManual(GameScene scene) async {
     //
     final title = formatDate(

@@ -15,6 +15,7 @@ import '../game/page_state.dart';
 import '../ui/build_utils.dart';
 import '../ui/settings/edit_page.dart';
 import '../routes/settings/settings_page.dart';
+import '../routes/battle/battle_page.dart';
 
 class ManualRef {
   Key? data;
@@ -69,31 +70,15 @@ class _SavedManualsState extends State<SavedManuals> {
 
   openManual(int index) async {
     //
-    final file = File(_manuals[index].path);
-    final content = await file.readAsString();
-
-    List<int> bytes = utf8.encode(content);
-    String crmBase64 = base64Encode(bytes);
-
-    final Uri launchUri = Uri(
-      scheme: 'https',
-      host: 'mdevs.cn',
-      path: _manuals[index].path,
-      queryParameters: {'crm': crmBase64},
+    print(_manuals[index].content);
+    await Navigator.of(context).push(
+      CupertinoPageRoute(
+        builder: (context) => BattlePage(
+          manualFileContent: _manuals[index].content,
+          battleName: "棋局 ${_manuals[index].title}",
+        ),
+      ),
     );
-
-    bool success;
-
-    try {
-      success = await launchUrl(
-        launchUri,
-        mode: LaunchMode.externalApplication,
-      );
-    } catch (e) {
-      success = false;
-    }
-
-    if (!success) if (mounted) showReadme(context);
   }
 
   Future<List<ManualRef>> loadManuals() async {

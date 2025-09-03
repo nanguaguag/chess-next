@@ -5,7 +5,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../ad/trigger.dart';
 import '../../cchess/cc_base.dart';
 import '../../cchess/cc_fen.dart';
 import '../../cchess/move_name.dart';
@@ -27,10 +26,16 @@ import '../../ui/snack_bar.dart';
 import '../settings/settings_page.dart';
 
 class BattlePage extends StatefulWidget {
-  //
   static const yourTurn = '请走棋';
 
-  const BattlePage({Key? key}) : super(key: key);
+  final Map<String, dynamic>? manualFileContent;
+  final String battleName;
+
+  const BattlePage({
+    super.key,
+    this.manualFileContent,
+    this.battleName = '人机练习',
+  });
 
   @override
   BattlePageState createState() => BattlePageState();
@@ -57,7 +62,11 @@ class BattlePageState extends State<BattlePage>
 
     createPieceAnimation(const Duration(milliseconds: 200), this);
 
-    await loadBattle();
+    if (widget.manualFileContent != null) {
+      await loadFromManualFile(widget.manualFileContent!);
+    } else {
+      await loadBattle();
+    }
 
     if (_boardState.isOpponentTurn && !_opponentHuman) {
       engineGo();
@@ -66,9 +75,16 @@ class BattlePageState extends State<BattlePage>
     }
   }
 
-  // 打开上一次退出时的棋谱
+  /// 打开上一次退出时的棋谱
+  /// 从 Profile 中读出：
+  /// - 初始局面 fen（battlepage-init-board）
+  /// - 历史走子（battlepage-move-list）
+  /// - 棋盘是否反转（battlepage-board-inversed）
+  /// - 对手是否是人类（battlepage-oppo-human），
+  /// 然后用 Fen.positionFromFen 初始化一个 Position，
+  /// 把历史走子一手一手走完，恢复到当时的局面，
+  /// 最后再交给 _boardState.setPosition()。
   Future<void> loadBattle() async {
-    //
     final profile = await Profile.local().load();
 
     final initBoard = profile['battlepage-init-board'] ?? Fen.defaultPosition;
@@ -90,10 +106,15 @@ class BattlePageState extends State<BattlePage>
       position.move(move);
     }
 
-    _boardState.inverseBoard(boardInversed, notify: false);
-    _boardState.setPosition(position);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _boardState.inverseBoard(boardInversed, notify: false);
+      _boardState.setPosition(position);
+    });
   }
 
+  /// 从 _boardState 里取出当前局面和走子列表（buildMoveListForManual()），
+  /// 存进 Profile.local() （本地存储，相当于 key-value 持久化），
+  /// 下次启动时就能恢复。
   Future<bool> saveBattle() async {
     //
     final moveList = _boardState.buildMoveListForManual();
@@ -151,8 +172,6 @@ class BattlePageState extends State<BattlePage>
 
   newGame(bool opponentFirst) async {
     //
-    if (AdTrigger.battle.checkAdChance(AdAction.start, context)) return;
-
     _boardState.inverseBoard(opponentFirst);
 
     _boardState.load(Fen.defaultPosition, notify: true);
@@ -175,8 +194,6 @@ class BattlePageState extends State<BattlePage>
 
   regret() async {
     //
-    if (AdTrigger.battle.checkAdChance(AdAction.regret, context)) return;
-
     await _stopPonder();
 
     _boardState.regret(GameScene.battle, moves: 2);
@@ -184,10 +201,6 @@ class BattlePageState extends State<BattlePage>
 
   analysisPosition() async {
     //
-    if (AdTrigger.battle.checkAdChance(AdAction.requestAnalysis, context)) {
-      return;
-    }
-
     showSnackBar('正在分析局面...', shortDuration: true);
 
     try {
@@ -286,6 +299,40 @@ class BattlePageState extends State<BattlePage>
 
     if (!mounted) return;
     showSnackBar(success ? '保存成功！' : '保存失败！');
+  }
+
+  /// 打开对局
+  Future<void> loadFromManualFile(Map<String, dynamic> fileContents) async {
+    final initBoard = fileContents['init_board'] ?? Fen.defaultPosition;
+    print("initBoard: $initBoard");
+    final moveListWrapped = fileContents['move_list'] ?? '';
+    final moveList = moveListWrapped
+        .replaceAll('[DhtmlXQ_movelist]', '')
+        .replaceAll('[/DhtmlXQ_movelist]', '');
+    print("moveList: $moveList");
+
+    final fen = Fen.crManualBoardToFen(initBoard);
+    final position = Fen.positionFromFen(fen);
+    if (position == null) {
+      print("error: position is null.");
+      return;
+    }
+
+    for (var i = 0; i < moveList.length; i += 4) {
+      final move = Move.fromCoordinate(
+        int.parse(moveList.substring(i, i + 1)),
+        int.parse(moveList.substring(i + 1, i + 2)),
+        int.parse(moveList.substring(i + 2, i + 3)),
+        int.parse(moveList.substring(i + 3, i + 4)),
+      );
+      position.move(move);
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _boardState.inverseBoard(false, notify: false); // 历史棋谱默认正向展示
+      _boardState.setPosition(position);
+      _opponentHuman = true; // 历史棋谱一般都是双人对局
+    });
   }
 
   onBoardTap(BuildContext context, int index) async {
@@ -495,8 +542,6 @@ class BattlePageState extends State<BattlePage>
 
   engineGoHint() async {
     //
-    if (AdTrigger.battle.checkAdChance(AdAction.requestHint, context)) return;
-
     final state = PikafishEngine().state;
     if (state == EngineState.searching || state == EngineState.hinting) return;
 
@@ -606,14 +651,59 @@ class BattlePageState extends State<BattlePage>
       onBoardTap: onBoardTap,
       opponentHuman: _opponentHuman,
     );
+
+    final subtitle = Consumer<PageState>(
+      builder: (context, pageState, child) {
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Text(
+            pageState.status,
+            maxLines: 1,
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.black54,
+            ),
+          ),
+        );
+      },
+    );
+
     final operatorBar = OperationBar(items: [
-      ActionItem(name: '新局', callback: confirmNewGame),
-      ActionItem(name: '悔棋', callback: regret),
-      ActionItem(name: '提示', callback: engineGoHint),
-      ActionItem(name: '云库', callback: analysisPosition),
-      ActionItem(name: '交换局面', callback: swapPosition),
-      ActionItem(name: '翻转棋盘', callback: inverseBoard),
-      ActionItem(name: '保存棋谱', callback: saveManual),
+      ActionItem(
+        name: '新局',
+        icon: Icons.casino_outlined,
+        callback: confirmNewGame,
+      ),
+      ActionItem(
+        name: '悔棋',
+        icon: Icons.history_outlined,
+        callback: regret,
+      ),
+      ActionItem(
+        name: '提示',
+        icon: Icons.lightbulb_outlined,
+        callback: engineGoHint,
+      ),
+      ActionItem(
+        name: '云库',
+        icon: Icons.cloud_outlined,
+        callback: analysisPosition,
+      ),
+      ActionItem(
+        name: '交换局面',
+        icon: Icons.loop_outlined,
+        callback: swapPosition,
+      ),
+      ActionItem(
+        name: '翻转棋盘',
+        icon: Icons.flip_outlined,
+        callback: inverseBoard,
+      ),
+      ActionItem(
+        name: '保存棋谱',
+        icon: Icons.save_outlined,
+        callback: saveManual,
+      ),
     ]);
 
     final footer = Consumer<BoardState>(
@@ -623,7 +713,7 @@ class BattlePageState extends State<BattlePage>
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          titleFor(context, GameScene.battle),
+          widget.battleName,
           overflow: TextOverflow.ellipsis,
         ),
         centerTitle: true,
@@ -654,11 +744,14 @@ class BattlePageState extends State<BattlePage>
           )
         ],
       ),
-      body: Column(children: <Widget>[
-        board,
-        operatorBar,
-        footer,
-      ]),
+      body: SingleChildScrollView(
+        child: Column(children: <Widget>[
+          subtitle,
+          board,
+          operatorBar,
+          footer,
+        ]),
+      ),
     );
   }
 
@@ -682,23 +775,18 @@ class BattlePageState extends State<BattlePage>
 
   Widget buildInfoPanel(String text) {
     //
-    final manualStyle = GameFonts.ui(
+    final manualStyle = TextStyle(
+      color: Colors.black54,
       fontSize: 15,
       height: 1.5,
     );
 
-    return Expanded(
-      child: Container(
-        // width: double.infinity,
-        margin: const EdgeInsets.all(16),
-        child: SingleChildScrollView(
-          child: Text(
-            text,
-            style: manualStyle,
-            textAlign: TextAlign.center,
-          ),
-        ),
-      ),
+    print(text);
+
+    return Text(
+      text,
+      style: manualStyle,
+      textAlign: TextAlign.center,
     );
   }
 

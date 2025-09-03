@@ -1,89 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import '../game/game.dart';
-import '../game/page_state.dart';
-import '../routes/settings/settings_page.dart';
 import 'board/thinking_board_widget.dart';
 import 'ruler.dart';
 
 const _paddingH = 10.0;
 
 double _additionPaddingH = 0;
-
-Widget createPageHeader(BuildContext context, GameScene scene,
-    {Function()? leftAction, Function()? rightAction}) {
-  //
-  var safeArea = EdgeInsets.only(top: Ruler.statusBarHeight(context));
-
-  if (!safeArea.isNonNegative) {
-    safeArea = const EdgeInsets.only(top: 26);
-  }
-
-  final isLongScreen = Ruler.isLongScreen(context);
-
-  final backButton = IconButton(
-    icon: const Icon(Icons.arrow_back),
-    onPressed: () => Navigator.of(context).pop(),
-  );
-
-  final settingButton = IconButton(
-    icon: const Icon(Icons.settings),
-    onPressed: () => Navigator.of(context).push(
-      CupertinoPageRoute(
-        builder: (context) => const SettingsPage(),
-      ),
-    ),
-  );
-
-  final title = Text(
-    titleFor(context, scene),
-    style: TextStyle(fontSize: 25),
-  );
-
-  final subtitle = Consumer<PageState>(
-    builder: (context, pageState, child) {
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Text(
-          pageState.status,
-          maxLines: 1,
-          style: TextStyle(fontSize: 16),
-        ),
-      );
-    },
-  );
-
-  final hLine = Container(
-    height: 4,
-    width: 80,
-    margin: const EdgeInsets.only(bottom: 10),
-    decoration: BoxDecoration(
-      color: Colors.grey,
-      borderRadius: BorderRadius.circular(2),
-    ),
-  );
-
-  return Container(
-    margin: safeArea,
-    child: Column(
-      children: <Widget>[
-        Row(
-          children: <Widget>[
-            backButton,
-            const Expanded(child: SizedBox()),
-            isLongScreen ? title : subtitle,
-            const Expanded(child: SizedBox()),
-            settingButton,
-          ],
-        ),
-        if (isLongScreen) hLine,
-        if (isLongScreen) subtitle,
-      ],
-    ),
-  );
-}
 
 Widget createChessBoard(BuildContext context, GameScene scene,
     {Function(BuildContext, int)? onBoardTap, bool opponentHuman = false}) {
@@ -142,8 +66,14 @@ String titleFor(BuildContext context, GameScene scene) {
   throw 'Scene is node define.';
 }
 
-drawText(Canvas canvas, String text, TextStyle textStyle,
-    {Offset? centerLocation, Offset? startLocation, Offset? endLocation}) {
+void drawText(
+  Canvas canvas,
+  String text,
+  TextStyle textStyle, {
+  Offset? centerLocation,
+  Offset? startLocation,
+  Offset? endLocation,
+}) {
   //
   final textSpan = TextSpan(text: text, style: textStyle);
   final textPainter = TextPainter(
